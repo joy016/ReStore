@@ -10,28 +10,30 @@ import HomePage from "../../features/home/HomePage";
 import Header from "./Header";
 import 'react-toastify/dist/ReactToastify.css'
 import BasketPage from "../../features/basket/BasketPage";
-import { useStoreContext } from "../context/StoreContext";
 import { getCookie } from "../util/Util";
 import agent from "../api/agent";
 import LoadingComponent from "./LoadingComponent";
 import CheckoutPage from "../../features/checkout/CheckoutPage";
+import { useAppDispatch } from "../redux/ConfigureStore";
+import { setBasket } from "../redux/slices/basketSlice";
+
 
 
 function App() {
- const {setBasket} = useStoreContext();
+ const dispatch = useAppDispatch();
  const [loading, SetLoading] = useState(true);
 
  useEffect(() => {
   const buyerId = getCookie('buyerId');
   if(buyerId) {
     agent.Basket.get()
-    .then(basket => setBasket(basket))
+    .then(basket => dispatch(setBasket(basket)))
     .catch(error => console.log(error))
     .finally(() => SetLoading(false)); 
   }else{
     SetLoading(false);
   }
- },[setBasket])
+ },[dispatch])
 
 
   const [darkMode, setDarkmode] = useState(false);

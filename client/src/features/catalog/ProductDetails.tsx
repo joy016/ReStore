@@ -1,30 +1,27 @@
 import { LoadingButton } from "@mui/lab";
-import { Divider, Grid, Table, TableCell, TableContainer, TableRow, TextField, Typography } from "@mui/material";
+import { Alert, AlertTitle, Divider, Grid, Table, TableCell, TableContainer, TableRow, TextField, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import agent from "../../app/api/agent";
-import { useStoreContext } from "../../app/context/StoreContext";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { Product } from "../../app/models/product";
+import { useAppDispatch, useAppSelector } from "../../app/redux/ConfigureStore";
+import { addBasketItemAsync, removeBasketItemAsync, setBasket } from "../../app/redux/slices/basketSlice";
+import { fetchSingleProductAsync, productSelector } from "../../app/redux/slices/catalogSlice";
 
 export default function ProductDetails (){
-    const {basket, setBasket, removeItem} = useStoreContext();
+    const {basket,status} = useAppSelector(state => state.basket);
+    const {status: productStatus} = useAppSelector(state => state.catalog);
+    const dispatch = useAppDispatch();
     const{id} = useParams<{id: string}>();
-    const [product, setProduct] = useState<Product | null>(null);
-    const[loading, setLoading] = useState(true);
+    const product = useAppSelector(state => productSelector.selectById(state, id!));
     const [quantity, setQuantity] = useState(0);
-    const [submitting, setSubmitting] = useState(false);
     const item = basket?.items.find(i => i.productId === product?.id);
 
     useEffect(() => {
         if(item) setQuantity(item.quantity);
-        const idValue = id || '';
-        agent.Catalog.details(parseInt(idValue))
-        .then(response => setProduct(response))
-        .catch(error => console.log(error))
-        .finally(() => setLoading(false));          
-    }, [id])
-
+        if(!product) dispatch(fetchSingleProductAsync(parseInt(id!)))         
+    }, [id, item, dispatch, product])
 
   function handleItemChange(event: any){
     if(event.target.value >= 0){
@@ -32,24 +29,21 @@ export default function ProductDetails (){
     }
   }
   
-  function handleUpdateCart(){
-    setSubmitting(true);
-    if(!item || quantity > item.quantity){
-        const updatedQuantity = item ? quantity - item.quantity : quantity;
-        agent.Basket.addItem(product?.id!,updatedQuantity)
-        .then(basket => setBasket(basket))
-        .catch(error => console.log(error))
-        .finally(() => setSubmitting(false))
-    }else{
-        const updatedQuantity = item.quantity - quantity;
-        agent.Basket.removeItem(product?.id!, updatedQuantity)
-        .then(() => removeItem(product?.id!,quantity))
-        .catch(error => console.log(error))
-        .finally(() => setSubmitting(false))
+    function handleUpdateCart(){
+        if(!item || quantity > item.quantity){
+            const updatedQuantity = item ? quantity - item.quantity : quantity;
+            dispatch(addBasketItemAsync({productId: product?.id!, quantity: updatedQuantity}))
+        }else{
+            dispatch(removeBasketItemAsync({productId: product?.id!, quantity: quantity, name: 'Rem' }))
+        }
     }
-  }
-if(loading) return <LoadingComponent message='Loading Product...'/>
-if(!product) return <h3>Product not found</h3>
+
+if(productStatus.includes('pendingFetchSingleProduct')) return <LoadingComponent message='Loading Product...'/>
+if(!product) return <Alert severity="success" color="info">
+                    This is a success alert — check it out!
+                    </Alert>
+//<h3>Oooopss Product not found</h3>
+    
     return(
         <Grid container spacing={6}>
             <Grid item xs={6}>
@@ -93,13 +87,14 @@ if(!product) return <h3>Product not found</h3>
                             defaultValue="Hello World"
                             fullWidth
                             value={quantity}
+                            //value={baske}
                         />
                     </Grid>
                     <Grid item xs={6}>
                         <LoadingButton sx={{height: '55px'}}
                         disabled={item?.quantity === quantity || !item && quantity === 0}
                         onClick={handleUpdateCart}
-                        loading={submitting}
+                        loading={status.includes('pendingAddItem')}
                         color='primary'
                         size='large'
                         variant='contained'

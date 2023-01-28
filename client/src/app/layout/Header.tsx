@@ -3,6 +3,7 @@ import { AppBar, Toolbar, Typography, Switch, List, ListItem, IconButton, Box } 
 import Badge from "@mui/material/Badge";
 import { Link, NavLink } from "react-router-dom";
 import { useStoreContext } from "../context/StoreContext";
+import { useAppDispatch, useAppSelector } from "../redux/ConfigureStore";
 interface Props{
   darkMode: boolean;
   handleThemeChange: () => void;
@@ -31,7 +32,7 @@ const navStyles = {
   }                 
 }
 export default function Header({darkMode, handleThemeChange}: Props){
-   const {basket} = useStoreContext();
+   const {basket} = useAppSelector(state => state.basket);
    const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
 
     return(

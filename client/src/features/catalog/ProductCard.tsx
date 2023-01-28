@@ -1,27 +1,20 @@
 import { LoadingButton } from "@mui/lab";
-import { Card, CardContent, Button, CardActions, CardMedia, Typography, CardHeader, Avatar } from "@mui/material";
-import { useState } from "react";
+import { Card, CardContent, Button, CardActions, CardMedia, Typography, CardHeader, Avatar, IconButton, Icon, Grid } from "@mui/material";
 import { Link } from "react-router-dom";
-import agent from "../../app/api/agent";
-import { useStoreContext } from "../../app/context/StoreContext";
 import { Product } from "../../app/models/product";
+import { useAppDispatch, useAppSelector } from "../../app/redux/ConfigureStore";
+import { addBasketItemAsync, setBasket } from "../../app/redux/slices/basketSlice";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 
 
 interface Props{
     product: Product;
 }
 
-
 export default function ProductCard({product}: Props){
-  const [loading, setLoading] = useState(false);
-  const {setBasket} = useStoreContext();
-  function HandleAddItem(productId: number){
-    setLoading(true);
-    agent.Basket.addItem(productId)
-    .then(basket => setBasket(basket))
-    .catch(error => console.log(error))
-    .finally(() => setLoading(false))
-  }
+  const {status} = useAppSelector(state => state.basket);
+  const dispatch = useAppDispatch();
+
     return(
         <Card>
           <CardHeader
@@ -49,13 +42,19 @@ export default function ProductCard({product}: Props){
           </Typography>
         </CardContent>
         <CardActions>
-          <LoadingButton loading={loading} onClick={() => HandleAddItem(product.id)} size="small">Add to Cart</LoadingButton>
-          <Button component={Link} to={`/catalog/${product.id}`} size="small">View</Button>
+        <Grid container spacing={2}>
+            <Grid item xs={6}>
+                <LoadingButton startIcon={<AddShoppingCartIcon />} variant="outlined" fullWidth
+              loading={status.includes('pendingAddItem' + product.id)} 
+              onClick={() => dispatch(addBasketItemAsync({productId: product.id}))} size="small">
+                Add to Cart</LoadingButton>
+            </Grid>
+            <Grid item xs={6}>        
+              <Button component={Link} to={`/catalog/${product.id}`} size="small" variant="outlined" fullWidth>View</Button>
+            </Grid>
+        </Grid>
+
         </CardActions>
       </Card>
-        
-
-
-
     )
 }

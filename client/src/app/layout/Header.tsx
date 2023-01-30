@@ -2,7 +2,6 @@ import { ShoppingCart } from "@mui/icons-material";
 import { AppBar, Toolbar, Typography, Switch, List, ListItem, IconButton, Box } from "@mui/material";
 import Badge from "@mui/material/Badge";
 import { Link, NavLink } from "react-router-dom";
-import { useStoreContext } from "../context/StoreContext";
 import { useAppDispatch, useAppSelector } from "../redux/ConfigureStore";
 interface Props{
   darkMode: boolean;

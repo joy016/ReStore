@@ -6,7 +6,7 @@ import agent from "../../app/api/agent";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { Product } from "../../app/models/product";
 import { useAppDispatch, useAppSelector } from "../../app/redux/ConfigureStore";
-import { addBasketItemAsync, removeBasketItemAsync, setBasket } from "../../app/redux/slices/basketSlice";
+import { addBasketItemAsync, removeBasketItemAsync} from "../../app/redux/slices/basketSlice";
 import { fetchSingleProductAsync, productSelector } from "../../app/redux/slices/catalogSlice";
 
 export default function ProductDetails (){

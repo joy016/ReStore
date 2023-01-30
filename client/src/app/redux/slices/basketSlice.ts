@@ -7,14 +7,12 @@ import { getCookie } from "../../util/Util";
 interface BasketState {
     basket: Basket | null,
     status: string,
-    newStateStatus: string
 }
 
 // initial state
 const initialState: BasketState = {
     basket: null,
     status: 'idle',
-    newStateStatus: 'idle'
 
 }
 

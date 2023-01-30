@@ -1,45 +1,99 @@
-import { Button } from "@mui/material";
-import { useEffect, useState } from "react";
-import agent from "../../app/api/agent";
+import { Grid, Paper } from "@mui/material";
+import { useEffect } from "react";
 import LoadingComponent from "../../app/layout/LoadingComponent";
-import { Product } from "../../app/models/product"
 import { useAppDispatch, useAppSelector } from "../../app/redux/ConfigureStore";
-import { fetchProductAsync, productSelector } from "../../app/redux/slices/catalogSlice";
+import {
+  fetchFilteredProducts,
+  fetchProductAsync,
+  productSelector,
+  setPageNumber,
+  setProductParams,
+} from "../../app/redux/slices/catalogSlice";
+import FilterProductBrand from "./FilterProductBrand";
 import ProductList from "./ProductList";
+import ProductPagination from "./ProductPagination";
+import ProductSearch from "./ProductSearch";
+import ProductSort from "./ProductSort";
 
-export default function Catalog(){
-   // const [products, setProducts] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(true);
-    const products = useAppSelector(productSelector.selectAll);
-    const {productsLoaded} = useAppSelector(state => state.catalog);
-    const dispatch = useAppDispatch();
-    const {status} = useAppSelector(state => state.catalog);
+const sortOptions = [
+  { value: "name", label: "Alphabetical" },
+  { value: "priceDesc", label: "Price - High to low" },
+  { value: "price", label: "Price - Low to high" },
+];
 
+export default function Catalog() {
+  const products = useAppSelector(productSelector.selectAll);
+  const {
+    productsLoaded,
+    filtersLoaded,
+    productParams,
+    brands,
+    types,
+    metaData,
+  } = useAppSelector((state) => state.catalog);
 
-        useEffect(() => {
-            if(!productsLoaded) dispatch(fetchProductAsync());
-        }, [productsLoaded, dispatch])
+  const dispatch = useAppDispatch();
 
-    if(status.includes('pendingFetchProducts')) return <LoadingComponent />
-  
-    // function addProduct(){
-    //   setProducts(prevState => [...prevState,
-    //     {
-    //         id: prevState.length + 101,  
-    //         name: 'product' + (prevState.length + 1), 
-    //         price: (prevState.length * 100) + 100,
-    //         brand: 'some brand',
-    //         description: 'some description',
-    //         pictureUrl: 'http://picsum.photos/200'
-        
-    //       }])
-    //     }
-    return(
-        <>
-            <ProductList products={products} />
-            {/* <Button variant="outlined" size="large" onClick={addProduct}>
-                Add Product
-            </Button> */}
-        </>
-    )
+  useEffect(() => {
+    if (!productsLoaded) dispatch(fetchProductAsync());
+  }, [productsLoaded, dispatch]);
+
+  useEffect(() => {
+    if (!filtersLoaded) {
+      dispatch(fetchFilteredProducts());
+    }
+  }, [filtersLoaded, dispatch]);
+
+  if (!filtersLoaded) return <LoadingComponent />;
+
+  return (
+    <Grid container spacing={4}>
+      <Grid item xs={3}>
+        <Paper sx={{ mb: 2 }}>
+          <ProductSearch />
+        </Paper>
+        <Paper sx={{ mb: 2, p: 2 }}>
+          <ProductSort
+            onChange={(e) =>
+              dispatch(setProductParams({ orderBy: e.target.value }))
+            }
+            options={sortOptions}
+            selectedValue={productParams.orderBy}
+          />
+        </Paper>
+        <Paper sx={{ mb: 2, p: 2 }}>
+          <FilterProductBrand
+            items={brands}
+            checked={productParams.brands}
+            onChange={(items: string[]) => {
+              dispatch(setProductParams({ brands: items }));
+            }}
+          />
+        </Paper>
+        <Paper sx={{ mb: 2, p: 2 }}>
+          <FilterProductBrand
+            items={types}
+            checked={productParams.types}
+            onChange={(items: string[]) => {
+              dispatch(setProductParams({ types: items }));
+            }}
+          />
+        </Paper>
+      </Grid>
+      <Grid item xs={9}>
+        <ProductList products={products} />
+      </Grid>
+      <Grid item xs={3} />
+      <Grid item xs={9}>
+        {metaData && (
+          <ProductPagination
+            metaData={metaData}
+            onChangePage={(page: number) => {
+              dispatch(setPageNumber({ pageNumber: page }));
+            }}
+          />
+        )}
+      </Grid>
+    </Grid>
+  );
 }

@@ -7,7 +7,7 @@ import { catalogSlice } from './slices/catalogSlice';
 export const store = configureStore({
     reducer: {
         basket: basketSlice.reducer,
-        catalog: catalogSlice.reducer
+        catalog: catalogSlice.reducer,
     }
 })
 

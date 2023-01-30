@@ -2,11 +2,9 @@ import { Add, Delete, Remove } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { Button, Grid, IconButton, makeStyles, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import agent from "../../app/api/agent";
 import { useAppDispatch, useAppSelector } from "../../app/redux/ConfigureStore";
-import { addBasketItemAsync, removeBasketItemAsync, setBasket } from "../../app/redux/slices/basketSlice";
+import { addBasketItemAsync, removeBasketItemAsync} from "../../app/redux/slices/basketSlice";
 import { currencyFormat } from "../../app/util/Util";
 import BasketSummary from "./BasketSummary";
 

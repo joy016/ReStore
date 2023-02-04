@@ -1,14 +1,19 @@
 import axios, { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
-import { json } from "stream/consumers";
 import { PagenatedResponse } from "../models/pagination";
-import { Metada } from "../models/pagination";
+import { store } from "../redux/ConfigureStore";
 
 const sleep = () => new Promise((resolve) => setTimeout(resolve, 500));
 axios.defaults.baseURL = "http://localhost:5000/api/";
 axios.defaults.withCredentials = true;
 
 const responseBody = (response: AxiosResponse) => response.data;
+
+axios.interceptors.request.use((config) => {
+  const token = store.getState().account.user?.token;
+  if (token) config.headers!.Authorization = `Bearer ${token}`;
+  return config;
+});
 
 axios.interceptors.response.use(
   async (response) => {
@@ -41,6 +46,7 @@ axios.interceptors.response.use(
         break;
       case 401:
         toast.error(data.title);
+
         break;
       case 500:
         toast.error(data.title);
@@ -80,11 +86,17 @@ const Basket = {
   removeItem: (productId: number, quantity = 1) =>
     requests.delete(`basket?productId=${productId}&quantity=${quantity}`),
 };
+const Account = {
+  login: (values: any) => requests.post("Account/login", values),
+  register: (values: any) => requests.post("Account/register", values),
+  currentUser: () => requests.get("Account/currentUser"),
+};
 
 const agent = {
   Catalog,
   TestErrors,
   Basket,
+  Account,
 };
 
 export default agent;

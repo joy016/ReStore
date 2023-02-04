@@ -1,0 +1,10 @@
+{
+  "json.format.enable": true,
+  "launch": {
+    "configurations": [],
+    "compounds": []
+  },
+  "[csharp]": {
+    "editor.formatOnSave": true
+  }
+}

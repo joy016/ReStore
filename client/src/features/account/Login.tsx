@@ -10,7 +10,7 @@ import {
   Grid,
   Paper,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useForm } from "react-hook-form";
 import { FieldValues } from "react-hook-form/dist/types";
@@ -31,6 +31,7 @@ export function Login() {
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   async function submitForm(data: FieldValues) {
     await dispatch(signInUser(data));

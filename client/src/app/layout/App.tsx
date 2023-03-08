@@ -72,11 +72,11 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/basket" element={<BasketPage />} />
-          {/* <Route path="/checkout" element={<CheckoutPage />} /> */}
-          <Route
+          <Route path="/checkout" element={<CheckoutPage />} />
+          {/* <Route
             path="/checkout"
             element={<PrivateRoute component={CheckoutPage} />}
-          />
+          /> */}
           <Route path="/register" element={<Register />} />
           <Route path="/account" element={<Login />} />
         </Routes>
